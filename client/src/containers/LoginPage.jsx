@@ -20,8 +20,35 @@ class LoginPage extends React.Component {
   processForm(event) {
     event.preventDefault();
 
-    console.log('email:', this.state.user.email);
-    console.log('password:', this.state.user.password);
+    const email = encodeURIComponent(this.state.email);
+    const password = encodeURIComponent(this.state.password);
+    const formData = `email=${email}&password=${password}`;
+
+    fetch('/auth/login', {
+      method: 'POST',
+      headers: new Headers({
+        'Content-type': 'application/x-www-form-urlencoded',
+      }),
+      body: formData,
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          this.setState({
+            errors: {},
+          });
+
+          console.log('the form is valid');
+        } else {
+          response.json().then((json) => {
+            const errors = json.errors ? json.errors : {};
+            errors.summary = json.message;
+
+            this.setState({
+              errors,
+            });
+          });
+        }
+      });
   }
 
   changeUser(event) {

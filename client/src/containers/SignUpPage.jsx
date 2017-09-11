@@ -32,9 +32,35 @@ class SignUpPage extends React.Component {
   processForm(event) {
     event.preventDefault();
 
-    console.log('name:', this.state.user.name);
-    console.log('email:', this.state.user.email);
-    console.log('password:', this.state.user.password);
+    const name = encodeURIComponent(this.state.user.name);
+    const email = encodeURIComponent(this.state.user.email);
+    const password = encodeURIComponent(this.state.user.password);
+    const formData = `name=${name}&email=${email}&password=${password}`;
+
+    fetch('/auth/signup', {
+      method: 'POST',
+      headers: new Headers({
+        'Content-type': 'application/x-www-form-urlencoded',
+      }),
+      body: formData,
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          this.setState({
+            errors: {},
+          });
+          console.log('the form is valid');
+        } else {
+          response.json().then((json) => {
+            const errors = json.errors ? json.errors : {};
+            errors.summary = json.message;
+
+            this.setState({
+              errors,
+            });
+          });
+        }
+      });
   }
 
   render() {

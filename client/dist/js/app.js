@@ -39961,10 +39961,38 @@ var LoginPage = function (_React$Component) {
   _createClass(LoginPage, [{
     key: 'processForm',
     value: function processForm(event) {
+      var _this2 = this;
+
       event.preventDefault();
 
-      console.log('email:', this.state.user.email);
-      console.log('password:', this.state.user.password);
+      var email = encodeURIComponent(this.state.email);
+      var password = encodeURIComponent(this.state.password);
+      var formData = 'email=' + email + '&password=' + password;
+
+      fetch('/auth/login', {
+        method: 'POST',
+        headers: new Headers({
+          'Content-type': 'application/x-www-form-urlencoded'
+        }),
+        body: formData
+      }).then(function (response) {
+        if (response.status === 200) {
+          _this2.setState({
+            errors: {}
+          });
+
+          console.log('the form is valid');
+        } else {
+          response.json().then(function (json) {
+            var errors = json.errors ? json.errors : {};
+            errors.summary = json.message;
+
+            _this2.setState({
+              errors: errors
+            });
+          });
+        }
+      });
     }
   }, {
     key: 'changeUser',
@@ -42165,11 +42193,39 @@ var SignUpPage = function (_React$Component) {
   }, {
     key: 'processForm',
     value: function processForm(event) {
+      var _this2 = this;
+
       event.preventDefault();
 
-      console.log('name:', this.state.user.name);
-      console.log('email:', this.state.user.email);
-      console.log('password:', this.state.user.password);
+      var name = encodeURIComponent(this.state.user.name);
+      var email = encodeURIComponent(this.state.user.email);
+      var password = encodeURIComponent(this.state.user.password);
+      var formData = 'name=' + name + '&email=' + email + '&password=' + password;
+
+      fetch('/auth/signup', {
+        method: 'POST',
+        headers: new Headers({
+          'Content-type': 'application/x-www-form-urlencoded'
+        }),
+        body: formData
+      }).then(function (response) {
+        console.log(response.status);
+        if (response.status === 200) {
+          _this2.setState({
+            errors: {}
+          });
+          console.log('the form is valid');
+        } else {
+          response.json().then(function (json) {
+            var errors = json.errors ? json.errors : {};
+            errors.summary = json.message;
+
+            _this2.setState({
+              errors: errors
+            });
+          });
+        }
+      });
     }
   }, {
     key: 'render',
